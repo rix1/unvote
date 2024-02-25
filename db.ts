@@ -1,9 +1,9 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { VotingDocument } from "./types.d.ts";
+import { VotingDocumentSummary } from "./types.d.ts";
 
 const db = new DB("./un_voting_data.db");
 
-export function insertIntoDatabase(data: Array<VotingDocument>) {
+export function insertIntoDatabase(data: Array<VotingDocumentSummary>) {
   for (const item of data) {
     try {
       db.query(

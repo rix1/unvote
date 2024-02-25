@@ -1,20 +1,18 @@
 import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 import { Element } from "https://deno.land/x/deno_dom@v0.1.45/src/dom/element.ts";
-import { VotingDocument } from "../types.d.ts";
+import { VotingDocumentSummary } from "../types.d.ts";
 import { assert } from "./assert.ts";
 
-const log = console.log;
-
-function formatKey(raw: string): keyof VotingDocument["votingData"] {
+function formatKey(raw: string): keyof VotingDocumentSummary["votingData"] {
   return raw
     .trim()
     .toLowerCase()
-    .replace(/[\s-]/g, "_") as keyof VotingDocument["votingData"];
+    .replace(/[\s-]/g, "_") as keyof VotingDocumentSummary["votingData"];
 }
 
 function parseVotingResults(
   results: string | undefined,
-): VotingDocument["votingData"] {
+): VotingDocumentSummary["votingData"] {
   /*
    * The voting results are in the format:
    ```html
@@ -29,11 +27,13 @@ function parseVotingResults(
       const [key, value] = next.split(":");
       return { ...prev, [formatKey(key)]: Number(value.trim()) };
     },
-    {} as VotingDocument["votingData"],
+    {} as VotingDocumentSummary["votingData"],
   );
 }
 
-function parseMetadata(meta: string | undefined): VotingDocument["metadata"] {
+function parseMetadata(
+  meta: string | undefined,
+): VotingDocumentSummary["metadata"] {
   /*
   * The metadata is in the format:
     ```html
@@ -52,7 +52,7 @@ function parseMetadata(meta: string | undefined): VotingDocument["metadata"] {
   return { resolution, vote_date, resourceType };
 }
 
-function parseRow(row: Element): VotingDocument {
+function parseRow(row: Element): VotingDocumentSummary {
   // Assert that we have the expected number of <td> elements
   const cells = [...row.querySelectorAll("td")];
   assert(cells.length >= 2, "Row does not contain at least two cells.");
@@ -104,7 +104,7 @@ function parseRow(row: Element): VotingDocument {
 }
 
 // Parse high level document summaries from the search results page
-export function parseSearchResults(html: string): Array<VotingDocument> {
+export function parseSearchResults(html: string): Array<VotingDocumentSummary> {
   const doc = new DOMParser().parseFromString(html, "text/html");
   if (!doc) throw new Error("Failed to parse HTML");
 
