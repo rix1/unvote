@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS voting_data (
   non_voting INTEGER,
   total_voting_membership INTEGER,
   resolution TEXT,
-  date DATE,
+  vote_date DATE,
   resourceType TEXT,
   scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

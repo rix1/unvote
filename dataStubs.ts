@@ -12,7 +12,7 @@ export const votingDocumentData = {
   },
   metadata: {
     resolution: "A/RES/77/208",
-    date: "2022-12-15",
+    vote_date: "2022-12-15",
     resourceType: "Voting Data",
   },
 };

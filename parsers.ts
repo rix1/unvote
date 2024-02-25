@@ -37,13 +37,13 @@ function parseMetadata(meta: string | undefined) {
   if (!meta) {
     throw new Error("Failed to parse metadata");
   }
-  const [resolution, date, resourceType] = meta
+  const [resolution, vote_date, resourceType] = meta
     .split("|")
     .map((item) => item.trim());
-  return { resolution, date, resourceType };
+  return { resolution, vote_date, resourceType };
 }
 
-function parseRow(row: Element) {
+function parseRow(row: Element): VotingDocument {
   const [first, second] = [...row.querySelectorAll("td")].map(
     (node) => node as Element,
   );
