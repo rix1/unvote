@@ -31,7 +31,7 @@ export function insertIntoDatabase(data: Array<VotingDocument>) {
           item.votingData.non_voting,
           item.votingData.total_voting_membership,
           item.metadata.resolution,
-          item.metadata.date,
+          item.metadata.vote_date,
           item.metadata.resourceType,
         ],
       );
