@@ -1,5 +1,5 @@
 export const votingDocumentData = {
-  documentId: "3997749",
+  document_id: "3997749",
   title:
     "The right of the Palestinian people to self-determination : resolution / adopted by the General Asse",
   authors: "RECORDED - No machine generated vote",

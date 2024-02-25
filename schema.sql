@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS voting_data (
-  documentId TEXT PRIMARY KEY,
+  document_id TEXT NOT NULL UNIQUE,
   title TEXT,
   authors TEXT,
   yes INTEGER,
@@ -8,7 +8,13 @@ CREATE TABLE IF NOT EXISTS voting_data (
   non_voting INTEGER,
   total_voting_membership INTEGER,
   resolution TEXT,
-  date TEXT,
+  date DATE,
   resourceType TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS test (
+  count INTEGER,
+  created_at DATE DEFAULT CURRENT_DATE
 );
