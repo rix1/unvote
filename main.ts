@@ -1,23 +1,39 @@
-import { parseVotingData } from "./parsers.ts";
+import { parseSearchResults } from "./parsers.ts";
 import { fetchPageContent } from "./api.ts";
-import { insertIntoDatabase } from "./db.ts";
+import { insertIntoDatabase, closeDatabase } from "./db.ts";
 
-// Main scraping function
-async function scrapeUNData() {
-  let currentPage = 1;
-  const MAX_PAGES = 1;
+const STARTING_YEAR = 1946;
+const END_YEAR = 2023;
+
+async function scrapeSearchResultsByYear() {
+  let currentYear = STARTING_YEAR;
   const baseURL =
-    "https://digitallibrary.un.org/search?ln=en&c=Voting+Data&rg=200&fct__2=General+Assembly&cc=Voting+Data&fct__9=Vote";
+    "https://digitallibrary.un.org/search?ln=en&cc=Voting%20Data&p=&f=&rm=&sf=&so=d&rg=200&c=Voting%20Data&c=&of=hb&fti=0&fct__2=General%20Assembly&fct__9=Vote&fti=0";
 
-  while (currentPage <= MAX_PAGES) {
-    const pageURL = `${baseURL}&jrec=${(currentPage - 1) * 200 + 1}`;
+  while (currentYear <= END_YEAR) {
+    const pageURL = `${baseURL}&fct__3=${currentYear}`;
+    console.log(
+      `Scraping voting documents from ${currentYear} (${currentYear} - ${END_YEAR}) - ${END_YEAR - currentYear} left.`,
+    );
     const htmlContent = await fetchPageContent(pageURL);
-    const votingData = parseVotingData(htmlContent);
-    insertIntoDatabase(votingData);
-    currentPage++;
+    try {
+      const votingData = parseSearchResults(htmlContent);
+      insertIntoDatabase(votingData);
+    } catch (e) {
+      if (
+        e instanceof Error &&
+        e.message.includes("search results may be empty")
+      ) {
+        console.log(`No results for ${currentYear}. Continuing...`);
+      }
+    }
+    currentYear++;
   }
 }
 
-scrapeUNData()
-  .then(() => console.log("Scraping complete."))
+scrapeSearchResultsByYear()
+  .then(() => {
+    closeDatabase();
+    console.log("Scraping complete.");
+  })
   .catch(console.error);

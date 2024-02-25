@@ -38,11 +38,26 @@ This command will initialize a new SQLite database according to the `schema.sql`
 
 3. **Running the Application:**
 
-To start the application, run:
+To start start scraping the UN voting data, run the following command:
 
 ```bash
-deno run --allow-net --allow-read --allow-write main.ts
+deno task run
 ```
+
+By default, the summary scraper will find all voting documents from 1946 - 2023. This can be adjusted with the `STARTING_YEAR` and `ENDING_YEAR` variables in `main.ts`.
+
+
+## Developing
+
+To start the development server, run the following command:
+
+```bash
+deno task dev
+```
+
+This starts a process that will watch for changes and reload autmatically.
+
+Note: To avoid waiting for network requests when hot reloading, we've added a simple cache with `localStorage`, when the DEV environment variable is set to `true` (the env variable is automatically set when you start the dev task). If you need to clear/inspect this cache, simply start the Deno REPL from the project root.
 
 
 ## Contributing

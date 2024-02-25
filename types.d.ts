@@ -1,3 +1,3 @@
 import { votingDocumentData } from "./dataStubs.ts";
 
-export type VotingData = typeof votingDocumentData;
+export type VotingDocument = typeof votingDocumentData;

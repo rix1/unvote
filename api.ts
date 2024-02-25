@@ -1,8 +1,12 @@
 // Function to fetch page content
+const DEV = Deno.env.get("DEV") === "true";
 export async function fetchPageContent(url: string): Promise<string> {
-  const cachedItem = localStorage.getItem(`cache:${url}`);
-  if (typeof cachedItem === "string") {
-    return cachedItem;
+  if (DEV) {
+    const cachedItem = localStorage.getItem(`cache:${url}`);
+    if (typeof cachedItem === "string") {
+      console.log("Using cached item for ", url);
+      return cachedItem;
+    }
   }
 
   const response = await fetch(url);
@@ -11,7 +15,9 @@ export async function fetchPageContent(url: string): Promise<string> {
   }
   const textResponse = await response.text();
 
-  localStorage.setItem(`cache:${url}`, textResponse);
+  if (DEV) {
+    localStorage.setItem(`cache:${url}`, textResponse);
+  }
 
   return textResponse;
 }
