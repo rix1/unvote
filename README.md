@@ -60,6 +60,10 @@ This starts a process that will watch for changes and reload autmatically.
 Note: To avoid waiting for network requests when hot reloading, we've added a simple cache with `localStorage`, when the DEV environment variable is set to `true` (the env variable is automatically set when you start the dev task). If you need to clear/inspect this cache, simply start the Deno REPL from the project root.
 
 
+### Dataset dumps
+
+- 2024-02-25 13:01 This database currently contains all documents, but no details about votes: https://www.dropbox.com/scl/fi/tlulebkx20agkzyan22vm/un_voting_data.db?rlkey=h15przktgtqnm3sfdvl5uhcco&dl=0
+
 ## Contributing
 
 Feel free to fork, submit pull requests, or just angrily vent about the UN in the issues section. All contributions are welcome, especially from fellow cynics and disillusioned idealists.
