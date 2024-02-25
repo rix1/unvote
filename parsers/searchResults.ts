@@ -1,6 +1,7 @@
 import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 import { Element } from "https://deno.land/x/deno_dom@v0.1.45/src/dom/element.ts";
 import { VotingDocument } from "../types.d.ts";
+import { assert } from "./assert.ts";
 
 const log = console.log;
 
@@ -52,50 +53,54 @@ function parseMetadata(meta: string | undefined): VotingDocument["metadata"] {
 }
 
 function parseRow(row: Element): VotingDocument {
-  const [first, second] = [...row.querySelectorAll("td")].map(
-    (node) => node as Element,
+  // Assert that we have the expected number of <td> elements
+  const cells = [...row.querySelectorAll("td")];
+  assert(cells.length >= 2, "Row does not contain at least two cells.");
+
+  const [firstCell, secondCell] = cells.map((node) => node as Element);
+
+  // Assert and extract document ID
+  const idElement = firstCell.querySelector("abbr");
+  assert(idElement, "Failed to find <abbr> element for document ID.");
+  const documentId = idElement.getAttribute("title");
+  assert(documentId, "Document ID is missing.");
+
+  // Extract title
+  const titleElement = secondCell.querySelector(".result-title > a");
+  assert(titleElement, "Failed to find title element.");
+  const title = titleElement.innerHTML.replaceAll("\n", "").trim();
+
+  // Extract authors
+  const authorsElement = secondCell.querySelector(".authors");
+  assert(authorsElement, "Failed to find authors element.");
+  const authors = authorsElement.innerHTML.trim();
+
+  // Extract voting results
+  const votingResultsElement = secondCell.querySelector(
+    ".result-abstract > div:nth-child(2)",
   );
-  if (!first || !second) {
-    throw new Error("Failed to parse row");
-  }
-  // Get ID from first cell
-  const id = first.querySelector("abbr")?.getAttribute("title");
-  if (!id) {
-    throw new Error("Failed to find document ID in DOM");
-  }
+  assert(votingResultsElement, "Failed to find voting results element.");
+  const votingResults = votingResultsElement.textContent.trim();
 
-  try {
-    // Extract other data from the second cell
-    const title = second
-      .querySelector(".result-title > a")
-      ?.innerHTML.replaceAll("\n", "")
-      .trim();
-    const authors = second.querySelector(".authors")?.innerHTML.trim();
-    const votingResults = second
-      .querySelector(".result-abstract > div:nth-child(2)")
-      ?.textContent.trim();
-    const metaData = second
-      .querySelector(".brief-options")
-      ?.textContent.trim()
-      .replace(/\s+/g, " ")
-      .replace(/\s\|$/, "");
+  // Extract metadata
+  const metaDataElement = secondCell.querySelector(".brief-options");
+  assert(metaDataElement, "Failed to find metadata element.");
+  const metaData = metaDataElement.textContent
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\s\|$/, "");
 
-    try {
-      const votingData = parseVotingResults(votingResults);
-      const metadata = parseMetadata(metaData);
-      return {
-        document_id: id,
-        title: title || "",
-        authors: authors || "",
-        votingData,
-        metadata,
-      };
-    } catch (error) {
-      log("Error parsing extracted data", votingResults, error);
-    }
-  } catch (error) {
-    log("Error finding DOM elements in row", row, error);
-  }
+  // Parse voting results and metadata
+  const votingData = parseVotingResults(votingResults);
+  const metadata = parseMetadata(metaData);
+
+  return {
+    document_id: documentId,
+    title: title,
+    authors: authors,
+    votingData,
+    metadata,
+  };
 }
 
 // Parse high level document summaries from the search results page
