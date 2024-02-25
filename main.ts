@@ -1,4 +1,4 @@
-import { parseSearchResults } from "./parsers.ts";
+import { parseSearchResults } from "./parsers/searchResults.ts";
 import { fetchPageContent } from "./api.ts";
 import { insertIntoDatabase, closeDatabase } from "./db.ts";
 

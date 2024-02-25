@@ -1,6 +1,6 @@
 import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 import { Element } from "https://deno.land/x/deno_dom@v0.1.45/src/dom/element.ts";
-import { VotingDocument } from "./types.d.ts";
+import { VotingDocument } from "../types.d.ts";
 
 const log = console.log;
 
