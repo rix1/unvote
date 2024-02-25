@@ -4,11 +4,16 @@ import { VotingDocument } from "./types.d.ts";
 
 const log = console.log;
 
-function formatKey(raw: string) {
-  return raw.trim().toLowerCase().replace(/[\s-]/g, "_");
+function formatKey(raw: string): keyof VotingDocument["votingData"] {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]/g, "_") as keyof VotingDocument["votingData"];
 }
 
-function parseVotingResults(results: string | undefined) {
+function parseVotingResults(
+  results: string | undefined,
+): VotingDocument["votingData"] {
   /*
    * The voting results are in the format:
    ```html
@@ -18,13 +23,16 @@ function parseVotingResults(results: string | undefined) {
   if (!results) {
     throw new Error("Failed to parse voting results");
   }
-  return results.split("|").reduce((prev, next) => {
-    const [key, value] = next.split(":");
-    return { ...prev, [formatKey(key)]: Number(value.trim()) };
-  }, {});
+  return results.split("|").reduce(
+    (prev, next) => {
+      const [key, value] = next.split(":");
+      return { ...prev, [formatKey(key)]: Number(value.trim()) };
+    },
+    {} as VotingDocument["votingData"],
+  );
 }
 
-function parseMetadata(meta: string | undefined) {
+function parseMetadata(meta: string | undefined): VotingDocument["metadata"] {
   /*
   * The metadata is in the format:
     ```html
@@ -52,6 +60,9 @@ function parseRow(row: Element): VotingDocument {
   }
   // Get ID from first cell
   const id = first.querySelector("abbr")?.getAttribute("title");
+  if (!id) {
+    throw new Error("Failed to find document ID in DOM");
+  }
 
   try {
     // Extract other data from the second cell
@@ -74,8 +85,8 @@ function parseRow(row: Element): VotingDocument {
       const metadata = parseMetadata(metaData);
       return {
         document_id: id,
-        title: title,
-        authors: authors,
+        title: title || "",
+        authors: authors || "",
         votingData,
         metadata,
       };
@@ -98,6 +109,9 @@ export function parseSearchResults(html: string): Array<VotingDocument> {
     throw new Error("Failed to find form - search results may be empty");
   }
 
-  const rows = [...form.querySelectorAll("table > tbody > tr")];
+  const rows = [
+    ...form.querySelectorAll("table > tbody > tr"),
+  ] as Array<Element>;
+
   return rows.map(parseRow);
 }
