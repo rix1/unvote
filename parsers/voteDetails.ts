@@ -1,6 +1,7 @@
 import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 import { assert } from "./assert.ts";
 import { VotingResults } from "../types.d.ts";
+import { Element, Node } from "https://deno.land/x/deno_dom@v0.1.45/src/api.ts";
 
 export function parseCountryList(votingResults: string[]) {
   const result: VotingResults = {
@@ -11,9 +12,9 @@ export function parseCountryList(votingResults: string[]) {
     total_voting_membership: 0,
   };
 
-  const pattern = /^(\s[YNA]\s)(.+)/;
+  const pattern = /^([YNA]\s)(.+)/;
   for (const vote of votingResults) {
-    const res = pattern.exec(vote);
+    const res = pattern.exec(vote.trim());
     switch (res?.[1].trim()) {
       case "Y":
         result.yes_countries.push(res[2].trim());
@@ -31,9 +32,24 @@ export function parseCountryList(votingResults: string[]) {
   }
   return result;
 }
+function isElement(node: Node | undefined): node is Element {
+  return !!node && node.nodeType === Node.ELEMENT_NODE;
+}
+
+function findSiblingOfVoteTitle(el: Element) {
+  const elements = el.querySelectorAll(".title");
+  const targetElement = [...elements].find(
+    (el) => el.textContent.trim() === "Vote",
+  );
+  if (!isElement(targetElement)) {
+    throw new Error("Failed to find Vote title!");
+  }
+  const sibling = targetElement?.nextElementSibling;
+  return sibling;
+}
 
 // Parse vote details from the vote details page
-export function voteDetailsParser(html: string) {
+export function voteDetailsParser(html: string): VotingResults {
   const doc = new DOMParser().parseFromString(html, "text/html");
   if (!doc) throw new Error("Failed to parse HTML");
 
@@ -48,23 +64,14 @@ export function voteDetailsParser(html: string) {
   );
   const fullDocumentTitle = documentTitleDiv.children[1].textContent.trim();
 
-  const voteDetailsHeaderDiv = detailsGroup.querySelector("div:nth-child(10)");
+  const countryDiv = findSiblingOfVoteTitle(detailsGroup);
+  assert(countryDiv, "Vote title was found, but no sibling was found.");
 
-  assert(voteDetailsHeaderDiv, "Failed to find 10th chils of details group");
-
-  const [first, second] = voteDetailsHeaderDiv.children;
-  const heading = first.textContent.trim();
-
-  assert(
-    heading === "Vote",
-    `Failed to find Vote header, found ${heading} instead`,
-  );
-
-  const votingResults = parseCountryList(second.innerHTML.split("<br>"));
+  const votingResults = parseCountryList(countryDiv.innerHTML.split("<br>"));
 
   return {
-    title: fullDocumentTitle,
     ...votingResults,
+    title: fullDocumentTitle,
     total_voting_membership:
       votingResults.yes_countries.length +
       votingResults.no_countries.length +

@@ -21,6 +21,7 @@ type Metadata = {
 };
 
 export type VotingResults = {
+  title: string;
   yes_countries: string[];
   no_countries: string[];
   abstention_countries: string[];

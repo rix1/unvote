@@ -13,6 +13,12 @@ CREATE TABLE IF NOT EXISTS voting_data (
   scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS voting_results (
+  document_id TEXT NOT NULL UNIQUE,
+  country TEXT,
+  vote TEXT CHECK(vote IN ('YES', 'NO', 'ABSTENTION', 'NON_VOTING')),
+  FOREIGN KEY (document_id) REFERENCES voting_data(document_id)
+);
 
 CREATE TABLE IF NOT EXISTS test (
   count INTEGER,
