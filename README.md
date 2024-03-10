@@ -8,7 +8,9 @@ This repository contains a Deno script for scraping all [UN voting documents](ht
 
 ## Why, Though?
 
-Why not? Also, because reading through the voting records manually would be as fun as watching paint dry on a wall that's already been painted too many times. Our hypothesis is that the UN might just be a glorified debating club with really good catering. But hey, we're open to being proven wrong—sort of.
+I was surprised and slightly annoyed over how difficult it was to query UN's digital library for insights. I wanted to know simple things like "Give me all resolutions where less than 5 countries have voted for (or against)", or "What are resolutions that come up every year, but never change? I found some similar projects and even a service with a REST API, but none were up to date, so I decided to just get all documents myself.
+
+I might turn this into a more usable service one day.
 
 ## Features
 
